@@ -92,18 +92,18 @@ async def process_voice_message(message: Message, bot: Bot):
     transcripted_voice_text = await audio_to_text(voice_path)
 
     if transcripted_voice_text:
-        # await message.reply(text=transcripted_voice_text)
-        await SendChatAction(
-            chat_id=message.from_user.id, action=ChatAction.TYPING
-        )
-        try:
-            msg = await create_chat_completion(transcripted_voice_text)
-            msg = msg.choices[0].message.content
-        except openai.error.RateLimitError:
-            msg = "Достигнут предел скорости. Ограничение: 3 запроса в минуту. Пожалуйста, повторите попытку через 20 секунд."
-        except Exception as e:
-            msg = f"Ошибка: {e}"
-        await message.answer(text=msg)
+        await message.reply(text=transcripted_voice_text)
+        # await SendChatAction(
+        #     chat_id=message.from_user.id, action=ChatAction.TYPING
+        # )
+        # try:
+        #     msg = await create_chat_completion(transcripted_voice_text)
+        #     msg = msg.choices[0].message.content
+        # except openai.error.RateLimitError:
+        #     msg = "Достигнут предел скорости. Ограничение: 3 запроса в минуту. Пожалуйста, повторите попытку через 20 секунд."
+        # except Exception as e:
+        #     msg = f"Ошибка: {e}"
+        # await message.answer(text=msg)
 
 
 async def main():
