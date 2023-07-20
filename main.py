@@ -5,7 +5,6 @@ import openai
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums.chat_action import ChatAction
 from aiogram.filters import Command
-from aiogram.methods import SendChatAction
 from aiogram.types import Message
 from dotenv import load_dotenv
 
@@ -20,6 +19,10 @@ openai.api_key = CHIMERA_API_KEY
 openai.api_base = 'https://chimeragpt.adventblocks.cc/v1'
 router: Router = Router()
 
+bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
+dp: Dispatcher = Dispatcher()
+dp.include_router(router)
+
 
 async def create_chat_completion(message):
     return await openai.ChatCompletion.acreate(
@@ -30,7 +33,7 @@ async def create_chat_completion(message):
 @router.message(Command(commands=['start']))
 async def process_start_command(message: Message):
     """Команда старт."""
-    await SendChatAction(
+    result: bool = await bot.send_chat_action(
         chat_id=message.from_user.id, action=ChatAction.TYPING
     )
     if str(message.from_user.id) not in WHITE_LIST_IDS:
@@ -47,7 +50,7 @@ async def process_text_message(message: Message):
     """Принимает текстовые сообщения."""
     if str(message.from_user.id) not in WHITE_LIST_IDS:
         return
-    await SendChatAction(
+    result: bool = await bot.send_chat_action(
         chat_id=message.from_user.id, action=ChatAction.TYPING
     )
     try:
@@ -64,9 +67,6 @@ async def process_text_message(message: Message):
 
 
 async def main():
-    bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
-    dp: Dispatcher = Dispatcher()
-    dp.include_router(router)
     await dp.start_polling(bot)
 
 
