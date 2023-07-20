@@ -1,4 +1,5 @@
 import asyncio
+import re
 from os import getenv
 
 import openai
@@ -56,13 +57,14 @@ async def process_text_message(message: Message):
     try:
         msg = await create_chat_completion(message.text)
         msg = msg.choices[0].message.content
-    except openai.error.RateLimitError:
-        msg = (
-            'Достигнут предел скорости. Ограничение: 3 запроса в минуту. '
-            'Пожалуйста, повторите попытку через 20 секунд.'
-        )
-    except Exception as e:
-        msg = f'Ошибка: {e}'
+    except openai.error.APIError as e:
+        detail_pattern = re.compile(r'{"detail":"(.*?)"}')
+        match = detail_pattern.search(e.user_message)
+        if match:
+            msg = match.group(1)
+        else:
+            msg = e.user_message
+
     await message.answer(text=msg)
 
 
