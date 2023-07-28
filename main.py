@@ -17,7 +17,8 @@ GPT_ENGINE = getenv('GPT_ENGINE')
 
 
 openai.api_key = CHIMERA_API_KEY
-openai.api_base = 'https://chimeragpt.adventblocks.cc/v1'
+# https://chimeragpt.adventblocks.cc/api/v1/models
+openai.api_base = 'https://chimeragpt.adventblocks.cc/api/v1'
 router: Router = Router()
 
 bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
