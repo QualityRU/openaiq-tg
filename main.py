@@ -17,7 +17,6 @@ GPT_ENGINE = getenv('GPT_ENGINE')
 
 
 openai.api_key = CHIMERA_API_KEY
-# https://chimeragpt.adventblocks.cc/api/v1/models
 openai.api_base = 'https://chimeragpt.adventblocks.cc/api/v1'
 router: Router = Router()
 
@@ -28,7 +27,9 @@ dp.include_router(router)
 
 async def create_chat_completion(message):
     return await openai.ChatCompletion.acreate(
-        model=GPT_ENGINE, messages=[{'role': 'user', 'content': message}]
+        model=GPT_ENGINE,
+        messages=[{'role': 'user', 'content': message}],
+        allow_fallback=True,
     )
 
 
