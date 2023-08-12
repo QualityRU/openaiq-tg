@@ -1,5 +1,5 @@
-import asyncio
-import re
+from asyncio import run
+from re import compile as re_compile
 from os import getenv
 
 import openai
@@ -10,22 +10,22 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 load_dotenv()
-TELEGRAM_BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN')
-WHITE_LIST_IDS = getenv('WHITE_LIST_IDS').split(', ')
-CHIMERA_API_KEY = getenv('CHIMERA_API_KEY')
-GPT_ENGINE = getenv('GPT_ENGINE')
+TELEGRAM_BOT_TOKEN: str = getenv('TELEGRAM_BOT_TOKEN')
+WHITE_LIST_IDS: list = getenv('WHITE_LIST_IDS').split(', ')
+CHIMERA_API_KEY: str = getenv('CHIMERA_API_KEY')
+GPT_ENGINE: str = getenv('GPT_ENGINE')
+
+bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
+dp: Dispatcher = Dispatcher()
+router: Router = Router()
+dp.include_router(router)
 
 
 openai.api_key = CHIMERA_API_KEY
 openai.api_base = 'https://chimeragpt.adventblocks.cc/api/v1'
-router: Router = Router()
-
-bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
-dp: Dispatcher = Dispatcher()
-dp.include_router(router)
 
 
-async def create_chat_completion(message):
+async def create_chat_completion(message: Message):
     return await openai.ChatCompletion.acreate(
         model=GPT_ENGINE,
         messages=[{'role': 'user', 'content': message}],
@@ -60,7 +60,7 @@ async def process_text_message(message: Message):
         msg = await create_chat_completion(message.text)
         msg = msg.choices[0].message.content
     except openai.error.APIError as e:
-        detail_pattern = re.compile(r'{"detail":"(.*?)"}')
+        detail_pattern = re_compile(r'{"detail":"(.*?)"}')
         match = detail_pattern.search(e.user_message)
         if match:
             msg = match.group(1)
@@ -75,4 +75,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    run(main())
