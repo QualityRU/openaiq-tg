@@ -1,21 +1,26 @@
 from logging import getLogger
 from typing import Any, Dict, Union
 
-from aiogram import F, Router
-from aiogram.enums.chat_action import ChatAction
-from aiogram.filters import Command
+from aiogram import Bot, F, Router
+from aiogram.filters import Command, Filter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from openai import AsyncOpenAI
 
 from app.states import ChatGPTStates
-from config import GPT_ENGINE, OPENAI_API_KEY
-
+from config import ADMIN_IDS, GPT_ENGINE, OPENAI_API_KEY
 
 logger = getLogger(__name__)
 
 router: Router = Router()
 client: AsyncOpenAI = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+# Assuming you have a bot instance initialized somewhere in your code
+
+
+class IsAdminFilter(Filter):
+    async def __call__(self, message: Message) -> bool:
+        return message.from_user.id in ADMIN_IDS
 
 
 async def create_chat_completion(
@@ -39,19 +44,18 @@ async def create_chat_completion(
         return str(e)
 
 
-@router.message(Command(commands=['start']))
+@router.message(Command(commands=['start']), IsAdminFilter())
 async def process_start_command(message: Message) -> None:
     """Команда старт."""
     logger.info(f'Команда /start от пользователя: {message.from_user.id}')
-    # await bot.send_chat_action(
-    #     chat_id=message.from_user.id, action=ChatAction.TYPING
-    # )
     msg: str = 'Напиши любое сообщение боту чтобы обратиться к ChatGPT!'
     await message.answer(msg)
 
 
-@router.message(F.content_type == 'text')
-async def process_text_message(message: Message, state: FSMContext) -> None:
+@router.message(F.content_type == 'text', IsAdminFilter())
+async def process_text_message(
+    message: Message, state: FSMContext, bot: Bot
+) -> None:
     """Принимает текстовые сообщения."""
     logger.info(
         f'Сообщение от пользователя {message.from_user.id}: {message.text}'
@@ -67,11 +71,12 @@ async def process_text_message(message: Message, state: FSMContext) -> None:
         return
 
     await state.set_state(ChatGPTStates.waiting_for_response)
-    # await bot.send_chat_action(
-    #     chat_id=message.from_user.id, action=ChatAction.TYPING
-    # )
 
     try:
+        # Send typing action
+        await bot.send_chat_action(chat_id=message.chat.id, action='typing')
+
+        # Generate response
         response = await create_chat_completion(message.text)
         if isinstance(response, str):
             msg = response
