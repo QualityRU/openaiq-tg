@@ -1,5 +1,5 @@
-import logging
 from asyncio import run
+from logging import INFO, basicConfig, getLogger
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -7,11 +7,11 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from app.handlers import router
 from config import TELEGRAM_BOT_TOKEN
 
-logging.basicConfig(
-    level=logging.INFO,
+basicConfig(
+    level=INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 )
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 async def main() -> None:

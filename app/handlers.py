@@ -15,8 +15,6 @@ logger = getLogger(__name__)
 router: Router = Router()
 client: AsyncOpenAI = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
-# Assuming you have a bot instance initialized somewhere in your code
-
 
 class IsAdminFilter(Filter):
     async def __call__(self, message: Message) -> bool:
