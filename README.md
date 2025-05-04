@@ -1,4 +1,4 @@
-# OpenAIQ - телеграмм бот с бесплатным доступом к ChatGPT 3.5 / 4
+# OpenAIQ - телеграмм бот с бесплатным доступом к ChatGPT 3.5 / 4 / 4o / 4.1
 Данный бот позволяет пользоваться ChatGPT через телеграмм бота.
 
 ### Технологии используемые в проекте:
@@ -10,7 +10,7 @@
 ### Инструкция по запуску
 1) Получить API-ключ для ChatGPT
 
-Проходим по ссылке (https://platform.openai.com/account/api-keys) и регистрируем свой API-ключ
+Проходим по ссылке (https://api.chatanywhere.org/v1/oauth/free/render) и регистрируем свой API-ключ
 
 2) Получить API-ключ телеграмм-бота
 
@@ -35,5 +35,5 @@ pip install -r requirements.txt
 
 6) Запустить бота
 ```
-python aiogram_run.py
+python main.py
 ```

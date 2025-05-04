@@ -13,7 +13,9 @@ from config import ADMIN_IDS, GPT_ENGINE, OPENAI_API_KEY
 logger = getLogger(__name__)
 
 router: Router = Router()
-client: AsyncOpenAI = AsyncOpenAI(api_key=OPENAI_API_KEY)
+client: AsyncOpenAI = AsyncOpenAI(
+    api_key=OPENAI_API_KEY, base_url='https://api.chatanywhere.tech/v1'
+)
 
 
 class IsAdminFilter(Filter):
@@ -71,10 +73,8 @@ async def process_text_message(
     await state.set_state(ChatGPTStates.waiting_for_response)
 
     try:
-        # Send typing action
         await bot.send_chat_action(chat_id=message.chat.id, action='typing')
 
-        # Generate response
         response = await create_chat_completion(message.text)
         if isinstance(response, str):
             msg = response
